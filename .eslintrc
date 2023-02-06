@@ -14,6 +14,7 @@
     {
       "files": [ "**/types.ts", "**/*.d.ts" ],
       "rules": {
+        "no-var": 0,
         "no-unused-vars":0,
         "quotes": [ 2, "double" ],
         "@typescript-eslint/no-explicit-any":0,
