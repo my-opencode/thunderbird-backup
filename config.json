@@ -1,0 +1,4 @@
+{
+  "sourceDirectories":["./testdata"],
+  "exportDirectory":"./exports"
+}

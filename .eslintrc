@@ -1,0 +1,24 @@
+{
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "rules": {
+    "no-unused-vars":[2,{"argsIgnorePattern":"Phantom$"}],
+    "@typescript-eslint/no-unused-vars":[2,{"argsIgnorePattern":"Phantom$"}],
+    "semi":"error"
+  },
+  "overrides": [
+    {
+      "files": [ "**/types.ts", "**/*.d.ts" ],
+      "rules": {
+        "no-unused-vars":0,
+        "quotes": [ 2, "double" ],
+        "@typescript-eslint/no-explicit-any":0,
+        "@typescript-eslint/no-namespace":0
+      }
+    }
+  ]
+}
