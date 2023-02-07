@@ -9,7 +9,9 @@
     "run:dev": "ts-node ./src/main.ts",
     "clean": "rm -r ./exports/*",
     "run:clean-dev": "npm run clean && npm run run:dev",
-    "run:dist": "node ./dist/main.js"
+    "run:dist": "node ./dist/main.js",
+    "pkg": "npm run build && pkg dist/main.js -t node14 -o thunderbird_backup.exe",
+    "start": "node dist/main.js"
   },
   "repository": {
     "type": "git",
@@ -27,6 +29,7 @@
   },
   "homepage": "https://github.com/my-opencode/thunderbird-backup#readme",
   "devDependencies": {
+    "@types/core-js": "^2.5.5",
     "@types/iconv": "^3.0.1",
     "@types/node": "^18.11.19",
     "@types/sanitize-filename": "^1.6.3",
@@ -37,7 +40,9 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
+    "core-js": "^3.27.2",
     "iconv": "^3.0.1",
+    "pkg": "^5.8.0",
     "sanitize-filename": "^1.6.3"
   }
 }

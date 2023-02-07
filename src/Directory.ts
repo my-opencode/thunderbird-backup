@@ -31,6 +31,6 @@ export class Directory {
   }
 
   static getAbsolutePath(p: string) {
-    return path.isAbsolute(p) ? p : path.resolve(__dirname, `..`, p);
+    return path.isAbsolute(p) ? p : path.resolve(global.__dirname, p);
   }
 }

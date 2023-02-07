@@ -28,13 +28,13 @@ export async function getEmailName(dir:Directory, m:ICurrentMail){
 }
 
 export async function saveEmail(dir: Directory, currentMail: ICurrentMail) {
-  // console.log(`Saving email.`);
+  // global.logger(`Saving email.`);
   rememberEmail(currentMail.messageId);
   const filename = await getEmailName(dir, currentMail);
   await fs.writeFile(dir.appendAbs(filename), currentMail.contents, { encoding: `utf-8` });
   rememberMailLocation(currentMail.messageId, dir.relPath, filename);
-  // console.log(`Email saved.`);
-  console.log(`Saved email ${currentMail.count + 1}. (${currentMail.messageId})`);
+  // global.logger(`Email saved.`);
+  global.logger(`Saved email ${currentMail.count + 1}. (${currentMail.messageId})`);
 }
 
 const moveCalls : string[] = [];
@@ -49,5 +49,5 @@ export async function moveEmail(id: string, outDir: Directory) {
     outDir.appendAbs(filename)
   );
   rememberMailLocation(id, outDir.relPath, filename);
-  console.log(`Moved "${filename}" from "${prevLocation.relPath}" to "${outDir.relPath}"`);
+  global.logger(`Moved "${filename}" from "${prevLocation.relPath}" to "${outDir.relPath}"`);
 }

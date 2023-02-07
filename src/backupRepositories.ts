@@ -10,7 +10,7 @@ export async function backupRepositories(existingDirs: Directory[]) {
 }
 
 async function backupRepository(dir: Directory) {
-  console.log(`Backing "${dir.relPath}".`);
+  global.logger(`Backing "${dir.relPath}".`);
   const { directories, mailFiles } = await listChildrenToBackup(dir);
   for (const mailFile of mailFiles)
     await backupMailBox(dir, mailFile);
@@ -19,6 +19,6 @@ async function backupRepository(dir: Directory) {
       path.join(dir.path, directory),
       { relativePath: dir.appendRel(directory) }
     ));
-  console.log(`"${dir.relPath}" backed.`);
+  global.logger(`"${dir.relPath}" backed.`);
 }
 

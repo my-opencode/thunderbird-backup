@@ -8,7 +8,7 @@ const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
 const Directory_1 = require("./Directory");
 async function loadKnownMailLocations() {
-    console.log(`Loading known mail locations.`);
+    global.logger(`Loading known mail locations.`);
     try {
         if (!exportDirAbs?.path)
             return;
@@ -19,7 +19,7 @@ async function loadKnownMailLocations() {
             const p = s.trim().split(`;`);
             global.knownMailLocations.set(p[0], [p[1], p[2]]);
         });
-        console.log(`Known mail locations loaded.`);
+        global.logger(`Known mail locations loaded.`);
     }
     catch (err) {
         // do nothing
@@ -27,11 +27,11 @@ async function loadKnownMailLocations() {
 }
 exports.loadKnownMailLocations = loadKnownMailLocations;
 function rememberMailLocation(id, location, filename) {
-    // console.log(`Memorizing email location.`);
+    // global.logger(`Memorizing email location.`);
     if (exportDirAbs?.path) // accept updates
         promises_1.default.appendFile(path_1.default.resolve(exportDirAbs.path, global.knownMailLocationFileName), `${id};${location};${filename}\n`);
     global.knownMailLocations.set(id, [location, filename]);
-    // console.log(`Email location memorized.`);
+    // global.logger(`Email location memorized.`);
 }
 exports.rememberMailLocation = rememberMailLocation;
 function isEmailLocationDiff(id, location) {

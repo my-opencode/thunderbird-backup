@@ -9,7 +9,7 @@ const knownMails_1 = require("./knownMails");
 const knownMailLocations_1 = require("./knownMailLocations");
 const targetDirectories_1 = require("./targetDirectories");
 async function prepare() {
-    console.log(`preparing`);
+    global.logger(`preparing`);
     const { sourceDirectories } = await (0, config_1.loadConfig)();
     await (0, lockFile_1.abortIfLocked)();
     await (0, lockFile_1.createLockFile)();
@@ -21,7 +21,7 @@ async function prepare() {
         throw new Error(`No source directory exists.`); // for ts conditional types
     }
     await (0, targetDirectories_1.createExportRootDirectories)(existingDirectories);
-    console.log(`Prepared.`);
+    global.logger(`Prepared.`);
     return { existingDirectories };
 }
 exports.prepare = prepare;

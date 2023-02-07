@@ -1,6 +1,9 @@
 import { exit } from "./exit";
 import { prepare } from "./prepare";
 import { backupRepositories } from "./backupRepositories";
+import "core-js/modules/es.string.replace-all";
+import { setRootPath } from "./rootPath";
+import { setLogger } from "./logger";
 
 global.MAILFILEEXT = `.msf`;
 global.lockFileName = `current_lock`;
@@ -9,13 +12,15 @@ global.knownMailLocationFileName = `known_mail_locations`;
 global.knownMails = new Set();
 global.knownMailLocations = new Map();
 
-export async function run() {
+export async function run(exePath?: string) {
+  setLogger();
+  setRootPath(exePath);
   try {
-    console.log(`Running.`);
+    global.logger(`Running.`);
     const { existingDirectories } = await prepare();
     await backupRepositories(existingDirectories);
-    console.log(`Backup complete.`);
-    exit();
+    global.logger(`Backup complete.`);
+    await exit();
   } catch (err) {
     console.error(err);
     await exit(err instanceof Error ? err.message : `Unexpected error.`);

@@ -7,7 +7,7 @@ import { loadKnownMailLocations } from "./knownMailLocations";
 import { createExportRootDirectories } from "./targetDirectories";
 
 export async function prepare() {
-  console.log(`preparing`);
+  global.logger(`preparing`);
   const { sourceDirectories } = await loadConfig();
   await abortIfLocked();
   await createLockFile();
@@ -19,7 +19,7 @@ export async function prepare() {
     throw new Error(`No source directory exists.`); // for ts conditional types
   }
   await createExportRootDirectories(existingDirectories);
-  console.log(`Prepared.`);
+  global.logger(`Prepared.`);
   return { existingDirectories };
 }
 

@@ -58,20 +58,38 @@ class Decoder {
         charset = charset && charset.toUpperCase() || "UTF-8";
         try {
             if (mimeWord) {
-                str = str.replace(/_/g, " ");
+                str = str.replaceAll(/_/g, " ");
             }
             else {
-                str = str.replace(/=\r\n/gm, '');
+                str = str.replaceAll(/=\r\n/gm, '');
                 str = str.replace(/=$/, "");
             }
             if (charset == "UTF-8")
-                str = decodeURIComponent(str.replace(/%/g, '%25').replace(/=/g, "%"));
+                str = decodeURIComponent(str.replaceAll(/%/g, '%25').replaceAll(/=/g, "%"));
             else {
-                str = str.replace(/%/g, '%25').replace(/=/g, "%");
-                if (charset == "ISO-8859-1" || charset == "LATIN1")
-                    str = unescape(str);
+                let _str = str;
+                str = str.replaceAll(/%/g, '%25').replaceAll(/=/g, "%");
+                if (charset == "ISO-8859-1" || charset == "LATIN1") {
+                    try {
+                        str = decodeURI(str);
+                    }
+                    catch (err) {
+                        console.log(`decode uri on: ${str}`);
+                    }
+                    try {
+                        _str = decodeURI(_str.replaceAll(/=[A-Z0-9]{2}/g, function (subs) {
+                            const n = parseInt(subs.slice(1), 16);
+                            return `&#${n};`;
+                        }));
+                        str = decodeURI(_str);
+                    }
+                    catch (err) {
+                        console.log(`decode uri on: ${str}`);
+                        throw err;
+                    }
+                }
                 else {
-                    global.logger(`other charset`, charset);
+                    console.log(`other charset`, charset);
                     const strBuffer = decodeBytestreamUrlencoding(str);
                     str = fromCharset(charset, strBuffer);
                 }
@@ -79,9 +97,9 @@ class Decoder {
             return str;
         }
         catch (err) {
-            global.logger(`Error decoding quoted printable "${charset}" "${str}"`);
+            console.log(`Error decoding quoted printable "${charset}" "${str}"`);
             if (err instanceof Error)
-                global.logger(err.stack || `no stack`);
+                console.log(err.stack || `no stack`);
             throw err;
         }
     }
@@ -138,8 +156,13 @@ function decodeBytestreamUrlencoding(encoded_string) {
 const s = `=?UTF-8?Q?Re=3a_Proposition_de_notice_de_d=c3=a9m=c3=a9nagement_en_?=`;
 const ms = `=?UTF-8?Q?Re=3a_Proposition_de_notice_de_d=c3=a9m=c3=a9nagement_en_?=
 =?UTF-8?Q?signature_d=27email?=`;
-// const s = `=?ISO-8859-1?Q?Re:_cam=E9ra_s=E9cu?=`;
+*/
+const s = `=?ISO-8859-1?Q?Re:_cam=E9ra_s=E9cu?=`;
 const d = new Decoder();
-global.logger(d.decodeMimeWord(s));
-global.logger(d.parseMimeWords(ms));
+console.log(decodeURI(`Re:_cam%C3%E9ra_s%C3%E9cu`));
+console.log(unescape(`Re:_cam%E9ra_s%E9cu`));
+// console.log(decodeURIComponent(`Re:_cam=E9ra_s=E9cu`.replace(/%/g, '%25').replace(/=/g, "%")));
+console.log(d.decodeMimeWord(s));
+/*
+console.log(d.parseMimeWords(ms));
 */ 

@@ -32,13 +32,13 @@ async function getEmailName(dir, m) {
 }
 exports.getEmailName = getEmailName;
 async function saveEmail(dir, currentMail) {
-    // console.log(`Saving email.`);
+    // global.logger(`Saving email.`);
     (0, knownMails_1.rememberEmail)(currentMail.messageId);
     const filename = await getEmailName(dir, currentMail);
     await promises_1.default.writeFile(dir.appendAbs(filename), currentMail.contents, { encoding: `utf-8` });
     (0, knownMailLocations_1.rememberMailLocation)(currentMail.messageId, dir.relPath, filename);
-    // console.log(`Email saved.`);
-    console.log(`Saved email ${currentMail.count + 1}. (${currentMail.messageId})`);
+    // global.logger(`Email saved.`);
+    global.logger(`Saved email ${currentMail.count + 1}. (${currentMail.messageId})`);
 }
 exports.saveEmail = saveEmail;
 const moveCalls = [];
@@ -49,6 +49,6 @@ async function moveEmail(id, outDir) {
         throw new Error(`Cannot move unknown mail`);
     await promises_1.default.rename(prevLocation.appendAbs(filename), outDir.appendAbs(filename));
     (0, knownMailLocations_1.rememberMailLocation)(id, outDir.relPath, filename);
-    console.log(`Moved "${filename}" from "${prevLocation.relPath}" to "${outDir.relPath}"`);
+    global.logger(`Moved "${filename}" from "${prevLocation.relPath}" to "${outDir.relPath}"`);
 }
 exports.moveEmail = moveEmail;

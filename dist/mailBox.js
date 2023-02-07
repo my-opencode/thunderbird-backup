@@ -14,7 +14,7 @@ const mimeWords_1 = require("./mimeWords");
 const knownMailLocations_1 = require("./knownMailLocations");
 const mimeDecoder = new mimeWords_1.Decoder();
 async function backupMailBox(dir, mailFile) {
-    console.log(`Backing emails of "${dir.appendRel(mailFile)}".`);
+    global.logger(`Backing emails of "${dir.appendRel(mailFile)}".`);
     const outRelPath = dir.appendRel(mailFile);
     const outDir = new Directory_1.Directory(exportDirAbs?.appendAbs?.(outRelPath) || ``, { relativePath: outRelPath });
     await promises_1.default.mkdir(outDir.path, { recursive: true });
@@ -44,10 +44,10 @@ async function backupMailBox(dir, mailFile) {
         await processMBoxLine(outDir, currentMail, previous, true);
     }
     if (currentMail.count) {
-        console.log(`Backed ${currentMail.count} emails of "${dir.appendRel(mailFile)}".`);
+        global.logger(`Backed ${currentMail.count} emails of "${dir.appendRel(mailFile)}".`);
     }
     else {
-        console.log(`No email backed for "${dir.appendRel(mailFile)}".`);
+        global.logger(`No email backed for "${dir.appendRel(mailFile)}".`);
     }
 }
 exports.backupMailBox = backupMailBox;

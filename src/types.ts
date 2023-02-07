@@ -12,6 +12,8 @@ export interface IConfig {
 }
 
 declare global {
+  function logger(...args:(string|number|string[])[]):void
+  var __dirname:string;
   var MAILFILEEXT:string;
   var exportDirAbs: Directory | undefined;
   var lockFileName:string;

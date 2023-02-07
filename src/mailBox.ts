@@ -11,7 +11,7 @@ import { isEmailLocationDiff } from "./knownMailLocations";
 const mimeDecoder = new Decoder();
 
 export async function backupMailBox(dir: Directory, mailFile: string) {
-  console.log(`Backing emails of "${dir.appendRel(mailFile)}".`);
+  global.logger(`Backing emails of "${dir.appendRel(mailFile)}".`);
   const outRelPath = dir.appendRel(mailFile);
   const outDir = new Directory(exportDirAbs?.appendAbs?.(outRelPath) || ``, {relativePath: outRelPath});
 
@@ -46,9 +46,9 @@ export async function backupMailBox(dir: Directory, mailFile: string) {
   }
 
   if (currentMail.count) {
-    console.log(`Backed ${currentMail.count} emails of "${dir.appendRel(mailFile)}".`);
+    global.logger(`Backed ${currentMail.count} emails of "${dir.appendRel(mailFile)}".`);
   } else {
-    console.log(`No email backed for "${dir.appendRel(mailFile)}".`);
+    global.logger(`No email backed for "${dir.appendRel(mailFile)}".`);
   }
 }
 

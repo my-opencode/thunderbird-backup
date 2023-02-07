@@ -1,3 +1,3 @@
 import { run } from "./run";
-
-run();
+console.log(process.argv);
+run(process.argv[0]);
