@@ -5,14 +5,17 @@ import path from "path";
 import { Directory } from "./Directory";
 import { ICurrentMail } from "./types";
 import { isEmailKnown } from "./knownMails";
-import { saveEmail } from "./mailEml";
+import { saveEmail, moveEmail } from "./mailEml";
 import { Decoder } from "./mimeWords";
+import { isEmailLocationDiff } from "./knownMailLocations";
 const mimeDecoder = new Decoder();
 
 export async function backupMailBox(dir: Directory, mailFile: string) {
-  console.log(`Backing emails of "${dir.appendRel(mailFile)}".`);
-  const outDirAbs = exportDirAbs?.appendAbs?.(dir.appendRel(mailFile)) || ``;
-  await fs.mkdir(outDirAbs, { recursive: true });
+  global.logger(`Backing emails of "${dir.appendRel(mailFile)}".`);
+  const outRelPath = dir.appendRel(mailFile);
+  const outDir = new Directory(exportDirAbs?.appendAbs?.(outRelPath) || ``, {relativePath: outRelPath});
+
+  await fs.mkdir(outDir.path, { recursive: true });
 
   const currentMail: ICurrentMail = {
     count: 0,
@@ -33,27 +36,29 @@ export async function backupMailBox(dir: Directory, mailFile: string) {
     let eolIndex = previous.indexOf('\n');
     while (eolIndex > -1) {
       const line = previous.slice(0, eolIndex + 1);
-      await processMBoxLine(outDirAbs, currentMail, line);
+      await processMBoxLine(outDir, currentMail, line);
       previous = previous.slice(eolIndex + 1);
       eolIndex = previous.indexOf('\n');
     }
   }
   if (previous.length > 0) {
-    await processMBoxLine(outDirAbs, currentMail, previous, true);
+    await processMBoxLine(outDir, currentMail, previous, true);
   }
 
   if (currentMail.count) {
-    console.log(`Backed ${currentMail.count} emails of "${dir.appendRel(mailFile)}".`);
+    global.logger(`Backed ${currentMail.count} emails of "${dir.appendRel(mailFile)}".`);
   } else {
-    console.log(`No email backed for "${dir.appendRel(mailFile)}".`);
+    global.logger(`No email backed for "${dir.appendRel(mailFile)}".`);
   }
 }
 
-async function processMBoxLine(outDirAbs: string, currentMail: ICurrentMail, line: string, isLast?: boolean) {
+async function processMBoxLine(outDir: Directory, currentMail: ICurrentMail, line: string, isLast?: boolean) {
   if (line.slice(0, 5) === `From `) {
     if (!currentMail.known && currentMail.contents.length) {
-      await saveEmail(outDirAbs, currentMail);
+      await saveEmail(outDir, currentMail);
       currentMail.count++;
+    } else if (currentMail.known && isEmailLocationDiff(currentMail.messageId, outDir.relPath)) {
+      await moveEmail(currentMail.messageId, outDir);
     }
     currentMail.contents = line;
     currentMail.subject = ``;
@@ -90,7 +95,7 @@ async function processMBoxLine(outDirAbs: string, currentMail: ICurrentMail, lin
     }
   }
   if (isLast && !currentMail.known) {
-    await saveEmail(outDirAbs, currentMail);
+    await saveEmail(outDir, currentMail);
     currentMail.count++;
   }
 }

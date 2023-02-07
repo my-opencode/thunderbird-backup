@@ -7,7 +7,7 @@ exports.listChildrenToBackup = exports.listExistingSourceDirectories = void 0;
 const promises_1 = __importDefault(require("fs/promises"));
 const Directory_1 = require("./Directory");
 async function listExistingSourceDirectories(paths) {
-    console.log(`Listing existing source directories.`);
+    global.logger(`Listing existing source directories.`);
     const existing = [];
     for (const p of paths) {
         try {
@@ -20,22 +20,22 @@ async function listExistingSourceDirectories(paths) {
             // do nothing
         }
     }
-    console.log(`Existing source directories listed.`);
+    global.logger(`Existing source directories listed.`);
     return existing;
 }
 exports.listExistingSourceDirectories = listExistingSourceDirectories;
 async function listChildrenToBackup(dir) {
-    console.log(`Listing children to backup.`);
+    global.logger(`Listing children to backup.`);
     const dirents = await promises_1.default.readdir(dir.path, { withFileTypes: true });
     const directories = [];
     const mailFiles = [];
     for (const dirent of dirents) {
         if (dirent.isDirectory())
             directories.push(dirent.name);
-        else if (dirent.isFile() && global.MAILFILEEXT === dirent.name.slice(-4))
+        else if (dirent.isFile() && global.MAILFILEEXT === dirent.name.slice(-4) && dirents.find(d => d.name === dirent.name.slice(0, -4)))
             mailFiles.push(dirent.name.slice(0, -4));
     }
-    console.log(`Children to backup listed.`);
+    global.logger(`Children to backup listed.`);
     return { directories, mailFiles };
 }
 exports.listChildrenToBackup = listChildrenToBackup;

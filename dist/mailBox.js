@@ -7,14 +7,17 @@ exports.backupMailBox = void 0;
 const fs_1 = require("fs");
 const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
+const Directory_1 = require("./Directory");
 const knownMails_1 = require("./knownMails");
 const mailEml_1 = require("./mailEml");
 const mimeWords_1 = require("./mimeWords");
+const knownMailLocations_1 = require("./knownMailLocations");
 const mimeDecoder = new mimeWords_1.Decoder();
 async function backupMailBox(dir, mailFile) {
-    console.log(`Backing emails of "${dir.appendRel(mailFile)}".`);
-    const outDirAbs = exportDirAbs?.appendAbs?.(dir.appendRel(mailFile)) || ``;
-    await promises_1.default.mkdir(outDirAbs, { recursive: true });
+    global.logger(`Backing emails of "${dir.appendRel(mailFile)}".`);
+    const outRelPath = dir.appendRel(mailFile);
+    const outDir = new Directory_1.Directory(exportDirAbs?.appendAbs?.(outRelPath) || ``, { relativePath: outRelPath });
+    await promises_1.default.mkdir(outDir.path, { recursive: true });
     const currentMail = {
         count: 0,
         contents: ``,
@@ -32,27 +35,30 @@ async function backupMailBox(dir, mailFile) {
         let eolIndex = previous.indexOf('\n');
         while (eolIndex > -1) {
             const line = previous.slice(0, eolIndex + 1);
-            await processMBoxLine(outDirAbs, currentMail, line);
+            await processMBoxLine(outDir, currentMail, line);
             previous = previous.slice(eolIndex + 1);
             eolIndex = previous.indexOf('\n');
         }
     }
     if (previous.length > 0) {
-        await processMBoxLine(outDirAbs, currentMail, previous, true);
+        await processMBoxLine(outDir, currentMail, previous, true);
     }
     if (currentMail.count) {
-        console.log(`Backed ${currentMail.count} emails of "${dir.appendRel(mailFile)}".`);
+        global.logger(`Backed ${currentMail.count} emails of "${dir.appendRel(mailFile)}".`);
     }
     else {
-        console.log(`No email backed for "${dir.appendRel(mailFile)}".`);
+        global.logger(`No email backed for "${dir.appendRel(mailFile)}".`);
     }
 }
 exports.backupMailBox = backupMailBox;
-async function processMBoxLine(outDirAbs, currentMail, line, isLast) {
+async function processMBoxLine(outDir, currentMail, line, isLast) {
     if (line.slice(0, 5) === `From `) {
         if (!currentMail.known && currentMail.contents.length) {
-            await (0, mailEml_1.saveEmail)(outDirAbs, currentMail);
+            await (0, mailEml_1.saveEmail)(outDir, currentMail);
             currentMail.count++;
+        }
+        else if (currentMail.known && (0, knownMailLocations_1.isEmailLocationDiff)(currentMail.messageId, outDir.relPath)) {
+            await (0, mailEml_1.moveEmail)(currentMail.messageId, outDir);
         }
         currentMail.contents = line;
         currentMail.subject = ``;
@@ -91,7 +97,7 @@ async function processMBoxLine(outDirAbs, currentMail, line, isLast) {
         }
     }
     if (isLast && !currentMail.known) {
-        await (0, mailEml_1.saveEmail)(outDirAbs, currentMail);
+        await (0, mailEml_1.saveEmail)(outDir, currentMail);
         currentMail.count++;
     }
 }

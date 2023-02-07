@@ -7,14 +7,14 @@ exports.isEmailKnown = exports.rememberEmail = exports.loadKnownMails = void 0;
 const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
 async function loadKnownMails() {
-    console.log(`Loading known mails.`);
+    global.logger(`Loading known mails.`);
     try {
         if (!exportDirAbs?.path)
             return;
         const km = await promises_1.default.readFile(path_1.default.resolve(exportDirAbs?.path, global.knownMailFileName), { encoding: `utf-8` });
         km.split(`\n`).forEach(s => { if (s)
             global.knownMails.add(s.trim()); });
-        console.log(`Known mails loaded.`);
+        global.logger(`Known mails loaded.`);
     }
     catch (err) {
         // do nothing
@@ -22,11 +22,11 @@ async function loadKnownMails() {
 }
 exports.loadKnownMails = loadKnownMails;
 function rememberEmail(id) {
-    // console.log(`Memorizing email ID.`);
+    // global.logger(`Memorizing email ID.`);
     if (!global.knownMails.has(id) && exportDirAbs?.path)
         promises_1.default.appendFile(path_1.default.resolve(exportDirAbs.path, global.knownMailFileName), `${id}\n`);
     global.knownMails.add(id);
-    // console.log(`Email ID memorized.`);
+    // global.logger(`Email ID memorized.`);
 }
 exports.rememberEmail = rememberEmail;
 function isEmailKnown(id) {

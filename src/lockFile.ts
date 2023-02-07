@@ -1,18 +1,23 @@
 import fs from "fs/promises";
-import { exit } from "./exit";
-
+import { readlineInterface } from "./readlineInterface";
 export async function abortIfLocked() {
   try {
     await fs.readFile(lockFileAbs || ``, { encoding: `utf-8` });
-    await exit(`Locked! Close all instances or delete lock file before running.`);
+    global.logger(`Locked! Close all instances or delete lock file before running.`);
+    readlineInterface.pause();
+    readlineInterface.question('Press enter to close', () => {
+      readlineInterface.write('Closing');
+      readlineInterface.close();
+      process.exit(2);
+    });
   } catch (err) {
     // do nothing
   }
 }
 
 export async function createLockFile() {
-  console.log(`Creating lock file.`);
+  global.logger(`Creating lock file.`);
   if (lockFileAbs)
     await fs.writeFile(lockFileAbs, ``, { encoding: `utf-8` });
-  console.log(`Lock file created.`);
+  global.logger(`Lock file created.`);
 }

@@ -42,7 +42,7 @@ export class Decoder {
   **/
   decodeQuotedPrintable(str: string, mimeWord?: boolean, charset?: string) {
     charset = charset && charset.toUpperCase() || "UTF-8";
-
+    try {
     if (mimeWord) {
       str = str.replace(/_/g, " ");
     } else {
@@ -54,14 +54,21 @@ export class Decoder {
     else {
       str = str.replace(/%/g, '%25').replace(/=/g, "%");
       if (charset == "ISO-8859-1" || charset == "LATIN1")
-        str = decodeURI(str);
+      str = unescape(str);
       else {
-        console.log(`other charset`, charset);
+        global.logger(`other charset`, charset);
         const strBuffer = decodeBytestreamUrlencoding(str);
         str = fromCharset(charset, strBuffer) as string;
       }
     }
+
     return str;
+  } catch(err){
+    global.logger(`Error decoding quoted printable "${charset}" "${str}"`);
+    if (err instanceof Error)
+      global.logger(err.stack||`no stack`);
+    throw err;
+  }
   }
 
   /**
@@ -142,7 +149,8 @@ function decodeBytestreamUrlencoding(encoded_string: string) {
 const s = `=?UTF-8?Q?Re=3a_Proposition_de_notice_de_d=c3=a9m=c3=a9nagement_en_?=`;
 const ms = `=?UTF-8?Q?Re=3a_Proposition_de_notice_de_d=c3=a9m=c3=a9nagement_en_?=
 =?UTF-8?Q?signature_d=27email?=`;
+// const s = `=?ISO-8859-1?Q?Re:_cam=E9ra_s=E9cu?=`;
 const d = new Decoder();
-console.log(d.decodeMimeWord(s));
-console.log(d.parseMimeWords(ms));
+global.logger(d.decodeMimeWord(s));
+global.logger(d.parseMimeWords(ms));
 */

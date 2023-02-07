@@ -8,7 +8,7 @@ const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
 const exit_1 = require("./exit");
 async function createExportRootDirectories(directories) {
-    console.log(`Creating export root directories.`);
+    global.logger(`Creating export root directories.`);
     if (!exportDirAbs?.path) {
         await (0, exit_1.exit)(`Export directory not set.`);
         throw new Error(`No source directory exists.`); // for ts conditional types
@@ -16,6 +16,6 @@ async function createExportRootDirectories(directories) {
     for (const p of directories) {
         await promises_1.default.mkdir(path_1.default.resolve(exportDirAbs.path, p.name), { recursive: true });
     }
-    console.log(`Export root directories created.`);
+    global.logger(`Export root directories created.`);
 }
 exports.createExportRootDirectories = createExportRootDirectories;
