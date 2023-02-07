@@ -3,6 +3,7 @@ import { exit } from "./exit";
 import { loadConfig } from "./config";
 import { createLockFile, abortIfLocked } from "./lockFile";
 import { loadKnownMails } from "./knownMails";
+import { loadKnownMailLocations } from "./knownMailLocations";
 import { createExportRootDirectories } from "./targetDirectories";
 
 export async function prepare() {
@@ -11,6 +12,7 @@ export async function prepare() {
   await abortIfLocked();
   await createLockFile();
   await loadKnownMails();
+  await loadKnownMailLocations();
   const existingDirectories = await listExistingSourceDirectories(sourceDirectories);
   if (!existingDirectories.length) {
     await exit(`No source directory exists.`);

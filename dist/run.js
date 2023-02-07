@@ -7,7 +7,9 @@ const backupRepositories_1 = require("./backupRepositories");
 global.MAILFILEEXT = `.msf`;
 global.lockFileName = `current_lock`;
 global.knownMailFileName = `known_mails`;
+global.knownMailLocationFileName = `known_mail_locations`;
 global.knownMails = new Set();
+global.knownMailLocations = new Map();
 async function run() {
     try {
         console.log(`Running.`);

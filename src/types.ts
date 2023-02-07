@@ -16,8 +16,10 @@ declare global {
   var exportDirAbs: Directory | undefined;
   var lockFileName:string;
   var knownMailFileName:string;
+  var knownMailLocationFileName:string;
   var lockFileAbs: string | undefined;
   var knownMails: Set<string>;
+  var knownMailLocations: Map<string,[string,string]>;
 }
 
 export interface ICurrentMail {

@@ -1,10 +1,10 @@
 import fs from "fs/promises";
-import { exit } from "./exit";
 
 export async function abortIfLocked() {
   try {
     await fs.readFile(lockFileAbs || ``, { encoding: `utf-8` });
-    await exit(`Locked! Close all instances or delete lock file before running.`);
+    console.log(`Locked! Close all instances or delete lock file before running.`);
+    process.exit(2);
   } catch (err) {
     // do nothing
   }

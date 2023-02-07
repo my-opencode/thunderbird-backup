@@ -5,7 +5,9 @@ import { backupRepositories } from "./backupRepositories";
 global.MAILFILEEXT = `.msf`;
 global.lockFileName = `current_lock`;
 global.knownMailFileName = `known_mails`;
+global.knownMailLocationFileName = `known_mail_locations`;
 global.knownMails = new Set();
+global.knownMailLocations = new Map();
 
 export async function run() {
   try {

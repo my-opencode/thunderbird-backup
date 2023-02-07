@@ -5,11 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createLockFile = exports.abortIfLocked = void 0;
 const promises_1 = __importDefault(require("fs/promises"));
-const exit_1 = require("./exit");
 async function abortIfLocked() {
     try {
         await promises_1.default.readFile(lockFileAbs || ``, { encoding: `utf-8` });
-        await (0, exit_1.exit)(`Locked! Close all instances or delete lock file before running.`);
+        console.log(`Locked! Close all instances or delete lock file before running.`);
+        process.exit(2);
     }
     catch (err) {
         // do nothing
