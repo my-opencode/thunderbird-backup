@@ -26,5 +26,7 @@ export interface ICurrentMail {
   subject: string;
   messageId: string;
   date: Date | undefined;
-  known: boolean
+  known: boolean;
+  awaitingId: boolean;
+  awaitingSubject: boolean;
 }

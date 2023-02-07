@@ -22,11 +22,11 @@ async function loadKnownMails() {
 }
 exports.loadKnownMails = loadKnownMails;
 function rememberEmail(id) {
-    console.log(`Memorizing email ID.`);
-    global.knownMails.add(id);
-    if (exportDirAbs?.path)
+    // console.log(`Memorizing email ID.`);
+    if (!global.knownMails.has(id) && exportDirAbs?.path)
         promises_1.default.appendFile(path_1.default.resolve(exportDirAbs.path, global.knownMailFileName), `${id}\n`);
-    console.log(`Email ID memorized.`);
+    global.knownMails.add(id);
+    // console.log(`Email ID memorized.`);
 }
 exports.rememberEmail = rememberEmail;
 function isEmailKnown(id) {

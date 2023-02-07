@@ -9,6 +9,8 @@ const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
 const knownMails_1 = require("./knownMails");
 const mailEml_1 = require("./mailEml");
+const mimeWords_1 = require("./mimeWords");
+const mimeDecoder = new mimeWords_1.Decoder();
 async function backupMailBox(dir, mailFile) {
     console.log(`Backing emails of "${dir.appendRel(mailFile)}".`);
     const outDirAbs = exportDirAbs?.appendAbs?.(dir.appendRel(mailFile)) || ``;
@@ -19,7 +21,9 @@ async function backupMailBox(dir, mailFile) {
         subject: ``,
         messageId: ``,
         date: undefined,
-        known: false
+        known: false,
+        awaitingId: false,
+        awaitingSubject: false
     };
     const readStream = (0, fs_1.createReadStream)(path_1.default.resolve(dir.path, mailFile));
     let previous = '';
@@ -55,20 +59,35 @@ async function processMBoxLine(outDirAbs, currentMail, line, isLast) {
         currentMail.messageId = ``;
         currentMail.date = undefined;
         currentMail.known = false;
+        currentMail.awaitingId = false;
+        currentMail.awaitingSubject = false;
     }
     else {
         if (!currentMail.known) {
             currentMail.contents += line;
-            if (!currentMail.subject && line.slice(0, 9) === `Subject: `)
-                currentMail.subject = encodeURI(line.slice(9)).trim();
-            if (!currentMail.messageId && line.slice(0, 12) === `Message-ID: `) {
-                currentMail.messageId = line.slice(12).trim();
-                currentMail.known = (0, knownMails_1.isEmailKnown)(currentMail.messageId);
-                if (currentMail.known)
-                    currentMail.contents = ``;
+            if (!currentMail.subject && (currentMail.awaitingSubject || line.slice(0, 8).toLowerCase() === `Subject:`.toLowerCase())) {
+                if (!currentMail.awaitingSubject || !/^\s*[^:]+:\s/.test(line)) {
+                    // to do capture following lines if subject was folded
+                    currentMail.subject = mimeDecoder.decodeMimeWord((currentMail.awaitingSubject ? line : line.slice(8)).trim());
+                    if (!currentMail.subject)
+                        currentMail.awaitingSubject = true;
+                    else
+                        currentMail.awaitingSubject = false;
+                }
             }
-            if (!currentMail.date && line.slice(0, 6) === `Date: `)
-                currentMail.date = new Date(line.slice(6));
+            if (!currentMail.messageId && (currentMail.awaitingId || line.slice(0, 11).toLowerCase() === (`Message-ID:`).toLowerCase())) {
+                currentMail.messageId = currentMail.awaitingId ? line.trim() : line.slice(11).trim();
+                if (!currentMail.messageId)
+                    currentMail.awaitingId = true;
+                else {
+                    currentMail.awaitingId = false;
+                    currentMail.known = (0, knownMails_1.isEmailKnown)(currentMail.messageId);
+                    if (currentMail.known)
+                        currentMail.contents = ``;
+                }
+            }
+            if (!currentMail.date && line.slice(0, 5).toLowerCase() === `Date:`.toLowerCase())
+                currentMail.date = new Date(line.slice(5).trim());
         }
     }
     if (isLast && !currentMail.known) {
