@@ -10,6 +10,7 @@
 
 - `--quiet`: Will disable Prompt for key to close window.
 - `--silent`: Implements `--quiet` and silences all logs.
+- `--config path/to/file`: To pass absolute path to config file, or relative path from the executable directory.
 
 ### Config file
 

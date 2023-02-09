@@ -23,5 +23,5 @@ export async function exit(msg?: string) {
       });
     });
   }
-  process.exit(1);
+  process.exit(msg ? 1 : 0);
 }
