@@ -5,12 +5,14 @@ import { createLockFile, abortIfLocked } from "./lockFile";
 import { loadKnownMails } from "./knownMails";
 import { loadKnownMailLocations } from "./knownMailLocations";
 import { createExportRootDirectories } from "./targetDirectories";
+import { clearErrorLogFiles } from "./errorLogFile";
 
 export async function prepare() {
   global.logger(`preparing`);
   const { sourceDirectories } = await loadConfig();
   await abortIfLocked();
   await createLockFile();
+  await clearErrorLogFiles();
   await loadKnownMails();
   await loadKnownMailLocations();
   const existingDirectories = await listExistingSourceDirectories(sourceDirectories);

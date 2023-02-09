@@ -74,7 +74,23 @@ async function processMBoxLine(outDir, currentMail, line, isLast) {
             if (!currentMail.subject && (currentMail.awaitingSubject || line.slice(0, 8).toLowerCase() === `Subject:`.toLowerCase())) {
                 if (!currentMail.awaitingSubject || !/^\s*[^:]+:\s/.test(line)) {
                     // to do capture following lines if subject was folded
-                    currentMail.subject = mimeDecoder.decodeMimeWord((currentMail.awaitingSubject ? line : line.slice(8)).trim());
+                    const subject = (currentMail.awaitingSubject ? line : line.slice(8)).trim();
+                    try {
+                        currentMail.subject = mimeDecoder.decodeMimeWord(subject);
+                    }
+                    catch (err) {
+                        if (subject.length) {
+                            // Most likely an encoding error
+                            const message = err instanceof Error
+                                ? `${err.message}\n\n${err.stack}`
+                                : typeof err === `string`
+                                    ? err
+                                    : `Unexpected subject decode error`;
+                            if (global.exportDirAbs)
+                                promises_1.default.appendFile(global.exportDirAbs.appendAbs(global.errorsDecodeFileName), `====DECODE_ERROR====\n\n${message}\n\n${currentMail.contents}\n\n`);
+                            currentMail.subject = subject;
+                        }
+                    }
                     if (!currentMail.subject)
                         currentMail.awaitingSubject = true;
                     else

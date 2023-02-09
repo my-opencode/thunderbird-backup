@@ -17,6 +17,8 @@ declare global {
   var MAILFILEEXT:string;
   var exportDirAbs: Directory | undefined;
   var lockFileName:string;
+  var errorsDecodeFileName:string;
+  var errorsNoIdFileName:string;
   var knownMailFileName:string;
   var knownMailLocationFileName:string;
   var lockFileAbs: string | undefined;

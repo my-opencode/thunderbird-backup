@@ -11,6 +11,8 @@ global.MAILFILEEXT = `.msf`;
 global.lockFileName = `current_lock`;
 global.knownMailFileName = `known_mails`;
 global.knownMailLocationFileName = `known_mail_locations`;
+global.errorsDecodeFileName = `errors_decode`;
+global.errorsNoIdFileName = `errors_id`;
 global.knownMails = new Set();
 global.knownMailLocations = new Map();
 async function run(exePath) {
