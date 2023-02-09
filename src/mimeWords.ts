@@ -1,7 +1,28 @@
+import fs from "fs/promises";
 import { Iconv } from "iconv";
+import { ICurrentMail } from "./types";
 export class Decoder {
   constructor() {
     return this;
+  }
+
+  decodeMimeWordSilent(str: string, currentMail:ICurrentMail): string {
+    if(!str) return str;
+    try {
+      str= this.decodeMimeWord(str);
+    } catch (err) {
+      if (str.length) {
+        // Most likely an encoding error
+        const message = err instanceof Error
+          ? `${err.message}\n\n${err.stack}`
+          : typeof err === `string`
+            ? err
+            : `Unexpected subject decode error`;
+        if (global.exportDirAbs)
+          fs.appendFile(global.exportDirAbs.appendAbs(global.errorsDecodeFileName), `====DECODE_ERROR====\n\n${message}\n\n${currentMail.contents}\n\n`);
+      }
+    }
+    return str;
   }
 
   /**

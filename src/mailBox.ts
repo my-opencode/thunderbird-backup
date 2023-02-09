@@ -13,7 +13,7 @@ const mimeDecoder = new Decoder();
 export async function backupMailBox(dir: Directory, mailFile: string) {
   global.logger(`Backing emails of "${dir.appendRel(mailFile)}".`);
   const outRelPath = dir.appendRel(mailFile);
-  const outDir = new Directory(exportDirAbs?.appendAbs?.(outRelPath) || ``, {relativePath: outRelPath});
+  const outDir = new Directory(exportDirAbs?.appendAbs?.(outRelPath) || ``, { relativePath: outRelPath });
 
   await fs.mkdir(outDir.path, { recursive: true });
 
@@ -73,7 +73,8 @@ async function processMBoxLine(outDir: Directory, currentMail: ICurrentMail, lin
       if (!currentMail.subject && (currentMail.awaitingSubject || line.slice(0, 8).toLowerCase() === `Subject:`.toLowerCase())) {
         if (!currentMail.awaitingSubject || !/^\s*[^:]+:\s/.test(line)) {
           // to do capture following lines if subject was folded
-          currentMail.subject = mimeDecoder.decodeMimeWord((currentMail.awaitingSubject ? line : line.slice(8)).trim());
+          const subject = (currentMail.awaitingSubject ? line : line.slice(8)).trim();
+          currentMail.subject = mimeDecoder.decodeMimeWordSilent(subject, currentMail);
           if (!currentMail.subject)
             currentMail.awaitingSubject = true;
           else

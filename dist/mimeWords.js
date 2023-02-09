@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Decoder = void 0;
+const promises_1 = __importDefault(require("fs/promises"));
 const iconv_1 = require("iconv");
 class Decoder {
     constructor() {
@@ -21,6 +25,26 @@ class Decoder {
             return buffer.toString("utf-8");
         };
         return this;
+    }
+    decodeMimeWordSilent(str, currentMail) {
+        if (!str)
+            return str;
+        try {
+            str = this.decodeMimeWord(str);
+        }
+        catch (err) {
+            if (str.length) {
+                // Most likely an encoding error
+                const message = err instanceof Error
+                    ? `${err.message}\n\n${err.stack}`
+                    : typeof err === `string`
+                        ? err
+                        : `Unexpected subject decode error`;
+                if (global.exportDirAbs)
+                    promises_1.default.appendFile(global.exportDirAbs.appendAbs(global.errorsDecodeFileName), `====DECODE_ERROR====\n\n${message}\n\n${currentMail.contents}\n\n`);
+            }
+        }
+        return str;
     }
     /**
     * mime.decodeMimeWord(str, encoding, charset) -> String

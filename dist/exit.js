@@ -29,6 +29,6 @@ async function exit(msg) {
             });
         });
     }
-    process.exit(1);
+    process.exit(msg ? 1 : 0);
 }
 exports.exit = exit;

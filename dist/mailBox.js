@@ -74,7 +74,8 @@ async function processMBoxLine(outDir, currentMail, line, isLast) {
             if (!currentMail.subject && (currentMail.awaitingSubject || line.slice(0, 8).toLowerCase() === `Subject:`.toLowerCase())) {
                 if (!currentMail.awaitingSubject || !/^\s*[^:]+:\s/.test(line)) {
                     // to do capture following lines if subject was folded
-                    currentMail.subject = mimeDecoder.decodeMimeWord((currentMail.awaitingSubject ? line : line.slice(8)).trim());
+                    const subject = (currentMail.awaitingSubject ? line : line.slice(8)).trim();
+                    currentMail.subject = mimeDecoder.decodeMimeWordSilent(subject, currentMail);
                     if (!currentMail.subject)
                         currentMail.awaitingSubject = true;
                     else
