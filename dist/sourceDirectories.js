@@ -32,8 +32,13 @@ async function listChildrenToBackup(dir) {
     for (const dirent of dirents) {
         if (dirent.isDirectory())
             directories.push(dirent.name);
-        else if (dirent.isFile() && global.MAILFILEEXT === dirent.name.slice(-4) && dirents.find(d => d.name === dirent.name.slice(0, -4)))
-            mailFiles.push(dirent.name.slice(0, -4));
+        else if (dirent.isFile() && global.MAILFILEEXT === dirent.name.slice(-4)) {
+            const mboxFileName = dirent.name.slice(0, -4);
+            const mboxFile = dirents.find(d => d.name === mboxFileName);
+            // there are msf files for folders, make sure only to open files
+            if (mboxFile?.isFile())
+                mailFiles.push(mboxFileName);
+        }
     }
     global.logger(`Children to backup listed.`);
     return { directories, mailFiles };

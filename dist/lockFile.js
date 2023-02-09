@@ -9,7 +9,7 @@ const readlineInterface_1 = require("./readlineInterface");
 async function abortIfLocked() {
     try {
         await promises_1.default.readFile(lockFileAbs || ``, { encoding: `utf-8` });
-        global.logger(`Locked! Close all instances or delete lock file before running.`);
+        global.logger(`Locked! Close all instances or delete lock file in your destination folder before running.`);
         readlineInterface_1.readlineInterface.pause();
         readlineInterface_1.readlineInterface.question('Press enter to close', () => {
             readlineInterface_1.readlineInterface.write('Closing');
