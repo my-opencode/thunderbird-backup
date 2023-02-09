@@ -3,7 +3,7 @@ import { readlineInterface } from "./readlineInterface";
 export async function abortIfLocked() {
   try {
     await fs.readFile(lockFileAbs || ``, { encoding: `utf-8` });
-    global.logger(`Locked! Close all instances or delete lock file before running.`);
+    global.logger(`Locked! Close all instances or delete lock file in your destination folder before running.`);
     readlineInterface.pause();
     readlineInterface.question('Press enter to close', () => {
       readlineInterface.write('Closing');
