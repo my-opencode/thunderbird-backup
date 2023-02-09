@@ -12,6 +12,7 @@ const knownMails_1 = require("./knownMails");
 const mailEml_1 = require("./mailEml");
 const mimeWords_1 = require("./mimeWords");
 const knownMailLocations_1 = require("./knownMailLocations");
+const crypto_1 = require("crypto");
 const mimeDecoder = new mimeWords_1.Decoder();
 async function backupMailBox(dir, mailFile) {
     global.logger(`Backing emails of "${dir.appendRel(mailFile)}".`);
@@ -53,6 +54,8 @@ async function backupMailBox(dir, mailFile) {
 exports.backupMailBox = backupMailBox;
 async function processMBoxLine(outDir, currentMail, line, isLast) {
     if (line.slice(0, 5) === `From `) {
+        if (!currentMail.messageId && currentMail.contents.length)
+            currentMail.messageId = messageIdSecondGuess(currentMail);
         if (!currentMail.known && currentMail.contents.length) {
             await (0, mailEml_1.saveEmail)(outDir, currentMail);
             currentMail.count++;
@@ -74,22 +77,29 @@ async function processMBoxLine(outDir, currentMail, line, isLast) {
             if (!currentMail.subject && (currentMail.awaitingSubject || line.slice(0, 8).toLowerCase() === `Subject:`.toLowerCase())) {
                 if (!currentMail.awaitingSubject || !/^\s*[^:]+:\s/.test(line)) {
                     // to do capture following lines if subject was folded
-                    currentMail.subject = mimeDecoder.decodeMimeWord((currentMail.awaitingSubject ? line : line.slice(8)).trim());
+                    const subject = (currentMail.awaitingSubject ? line : line.slice(8)).trim();
+                    currentMail.subject = mimeDecoder.decodeMimeWordSilent(subject, currentMail);
                     if (!currentMail.subject)
                         currentMail.awaitingSubject = true;
                     else
                         currentMail.awaitingSubject = false;
                 }
             }
-            if (!currentMail.messageId && (currentMail.awaitingId || line.slice(0, 11).toLowerCase() === (`Message-ID:`).toLowerCase())) {
-                currentMail.messageId = currentMail.awaitingId ? line.trim() : line.slice(11).trim();
-                if (!currentMail.messageId)
-                    currentMail.awaitingId = true;
-                else {
+            if (!currentMail.messageId && (currentMail.awaitingId || line.slice(0, 11).toLowerCase() === `Message-ID:`.toLowerCase())) {
+                if (!currentMail.awaitingId || !/^\s*[^:]+:\s/.test(line)) {
+                    // to do capture following lines if id was folded
+                    currentMail.messageId = (currentMail.awaitingId ? line : line.slice(11)).trim();
+                    if (!currentMail.messageId)
+                        currentMail.awaitingId = true;
+                    else {
+                        currentMail.awaitingId = false;
+                        currentMail.known = (0, knownMails_1.isEmailKnown)(currentMail.messageId);
+                        if (currentMail.known)
+                            currentMail.contents = ``;
+                    }
+                }
+                else if (currentMail.awaitingId) {
                     currentMail.awaitingId = false;
-                    currentMail.known = (0, knownMails_1.isEmailKnown)(currentMail.messageId);
-                    if (currentMail.known)
-                        currentMail.contents = ``;
                 }
             }
             if (!currentMail.date && line.slice(0, 5).toLowerCase() === `Date:`.toLowerCase())
@@ -100,4 +110,40 @@ async function processMBoxLine(outDir, currentMail, line, isLast) {
         await (0, mailEml_1.saveEmail)(outDir, currentMail);
         currentMail.count++;
     }
+}
+function messageIdSecondGuess(currentMail) {
+    if (!currentMail.contents.length)
+        return ``;
+    let errorLog = `==== MISSING MESSAGE ID ERROR ====`;
+    const i = currentMail.contents.toLowerCase().indexOf(`message-id:`);
+    if (i < 0) {
+        errorLog += `\n\nDid not find message-id token in contents.`;
+        // can't find token
+    }
+    else {
+        // token found
+        errorLog += `\nFound message-id token in contents.`;
+        const rawIdMatch = currentMail.contents.slice(i).match(/^([^:]+)[\n\r]+[^\n:]+?:/);
+        if (rawIdMatch?.[1]) {
+            // token has contents
+            errorLog += `\nFound message-id contents.`;
+            const rawId = rawIdMatch[1].split(`\n`).map(s => s.trim()).join(``);
+            if (rawId.length) {
+                // contents are non empty
+                // errorLog += `\nFound a readable message-id.`;
+                return rawId;
+            }
+            else {
+                errorLog += `\nDid not find any readable message-id.`;
+            }
+        }
+        else {
+            errorLog += `\nDid not find message-id contents.`;
+        }
+    }
+    const hash = (0, crypto_1.createHash)(`md5`).update(currentMail.contents).digest(`hex`);
+    errorLog += `\n\nUsing hash insteal: "${hash}"\n\n${currentMail.contents}\n\n`;
+    if (global.exportDirAbs?.path)
+        promises_1.default.appendFile(global.exportDirAbs.appendAbs(global.errorsNoIdFileName), errorLog, { encoding: `utf-8` });
+    return hash;
 }
