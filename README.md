@@ -14,7 +14,11 @@
 
 ### Config file
 
-JSON object saved as `config.json` in the same directory:
+By default the utility looks for a "config.json" file in the executable directory.
+
+Because of the packaging, when calling the utility from another executable, the directory of the first one may be used. In that case, use the --config flag.
+
+JSON object:
 
 ```
 {
@@ -35,8 +39,8 @@ JSON object saved as `config.json` in the same directory:
 
 ### Behavior
 
-1. Looks for a `lock_file` in  `exportDirectory`. Aborts if found.
-2. Creates a `lock_file`.
+1. Looks for a `current_lock` in  `exportDirectory`. Aborts if found.
+2. Creates a `current_lock`.
 3. Loads `known_mails` and `known_mail_locations` from `exportDirectory`.
 4. Lists all existing `sourceDirectories`.
 5. Creates an export subdirectory in `exportDirectory` for each `sourceDirectories`.
@@ -46,6 +50,7 @@ JSON object saved as `config.json` in the same directory:
    "_xxxx" is appended to the name if there are duplicates.
 8. Updates `known_mails` and `known_mail_locations`.
 9. Known emails are skipped if at the same location, or moved if in a new location.
+10. Removes `current_lock` on exit.
 
 ### Destinations
 
@@ -54,9 +59,16 @@ JSON object saved as `config.json` in the same directory:
 - Works with mounted samba network drives.
   Example: `"\\\\10.0.0.1\\Shared Folder\\Mails"`;
 
-### Possibe issues
+### Log files
 
-The decoding logic is weak, only really works for uft-8, ISO-8859-1, Latin1 and others supported by Iconv.
+The utility is logging at the root of the export directory set in the config file.
+
+### Errors
+
+The utility is set to log most commonly encountered errors:
+- Email decoding error
+- Email "message-id" not found
+- Move Email error
 
 ### License
 
