@@ -7,6 +7,7 @@ import { setLogger } from "./logger";
 
 global.MAILFILEEXT = `.msf`;
 global.lockFileName = `current_lock`;
+global.previousUpdateFileName = `last_update`;
 global.knownMailFileName = `known_mails`;
 global.knownMailLocationFileName = `known_mail_locations`;
 global.errorsDecodeFileName = `errors_decode`;
@@ -15,7 +16,14 @@ global.errorsMoveFileName = `errors_move`;
 global.knownMails = new Set();
 global.knownMailLocations = new Map();
 
+global.savedCount = 0;
+global.movedCount = 0;
+global.idErrorCount = 0;
+global.encodingErrorCount = 0;
+global.moveErrorCount = 0;
+
 export async function run(exePath?: string) {
+  global.runStartTime = process.hrtime();
   setLogger();
   setRootPath(exePath);
   try {

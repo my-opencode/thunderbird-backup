@@ -32,6 +32,7 @@ export async function saveEmail(dir: Directory, currentMail: ICurrentMail) {
   rememberEmail(currentMail.messageId);
   const filename = await getEmailName(dir, currentMail);
   await fs.writeFile(dir.appendAbs(filename), currentMail.contents, { encoding: `utf-8` });
+  global.savedCount++;
   rememberMailLocation(currentMail.messageId, dir.relPath, filename);
   // global.logger(`Email saved.`);
   global.logger(`Saved email ${currentMail.count + 1}. (${currentMail.messageId})`);
@@ -50,9 +51,11 @@ export async function moveEmail(dir: Directory, currentMail: ICurrentMail) {
       prevLocation.appendAbs(filename),
       dir.appendAbs(filename)
     );
+    global.movedCount++;
     rememberMailLocation(currentMail.messageId, dir.relPath, filename);
     global.logger(`Moved "${filename}" from "${prevLocation.relPath}" to "${dir.relPath}"`);
   } catch (err) {
+    global.moveErrorCount++;
     let errorLog = `==== Move Email Error ====\n\n`;
     errorLog += err instanceof Error ? `${err.message}\n\n${err.stack}` : typeof err === `string` ? err : `Unexpected error.`;
     errorLog += `\n\n`;

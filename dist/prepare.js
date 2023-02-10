@@ -9,6 +9,7 @@ const knownMails_1 = require("./knownMails");
 const knownMailLocations_1 = require("./knownMailLocations");
 const targetDirectories_1 = require("./targetDirectories");
 const errorLogFile_1 = require("./errorLogFile");
+const previousUpdate_1 = require("./previousUpdate");
 async function prepare() {
     global.logger(`preparing`);
     const { sourceDirectories } = await (0, config_1.loadConfig)();
@@ -17,6 +18,7 @@ async function prepare() {
     await (0, errorLogFile_1.clearErrorLogFiles)();
     await (0, knownMails_1.loadKnownMails)();
     await (0, knownMailLocations_1.loadKnownMailLocations)();
+    await (0, previousUpdate_1.refreshLastUpdateFile)();
     const existingDirectories = await (0, sourceDirectories_1.listExistingSourceDirectories)(sourceDirectories);
     if (!existingDirectories.length) {
         await (0, exit_1.exit)(`No source directory exists.`);

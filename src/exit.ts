@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import { saveCompletionStatus } from "./previousUpdate";
 import { readlineInterface } from "./readlineInterface";
 
 export async function exit(msg?: string) {
@@ -13,6 +14,7 @@ export async function exit(msg?: string) {
   //   console.error(err);
   // }
   // global.logger(process.argv);
+  await saveCompletionStatus(msg ? `Error: ${msg}` : `Success`);
   if (!process.argv.includes(`--silent`) && !process.argv.includes(`--quiet`)) {
     readlineInterface.pause();
     await new Promise(r => {
