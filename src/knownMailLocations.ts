@@ -18,6 +18,26 @@ export async function loadKnownMailLocations() {
   }
 }
 
+export async function cleanKnownMailLocations() {
+  global.logger(`Cleaning known mail locations.`);
+  try {
+    if (!global.exportDirAbs?.path) return;
+    const filePath = global.exportDirAbs.appendAbs(global.knownMailLocationFileName);
+    await fs.rename(filePath, filePath+`_bak`);
+    const appendTasks: Promise<void>[] = [];
+    for (const [id, [relPath, name]] of global.knownMailLocations.entries())
+      appendTasks.push(fs.appendFile(
+        filePath,
+        `${id};${relPath};${name}\n`,
+        { encoding: `utf-8` }
+      ));
+    await Promise.all(appendTasks);
+    global.logger(`Known mail locations cleaned.`);
+  } catch (err) {
+    // do nothing
+  }
+}
+
 export function rememberMailLocation(id: string, location: string, filename: string) {
   // global.logger(`Memorizing email location.`);
   if (exportDirAbs?.path) // accept updates
