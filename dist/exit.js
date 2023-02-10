@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.exit = void 0;
 const promises_1 = __importDefault(require("fs/promises"));
+const previousUpdate_1 = require("./previousUpdate");
 const readlineInterface_1 = require("./readlineInterface");
 async function exit(msg) {
     if (msg)
@@ -19,6 +20,7 @@ async function exit(msg) {
     //   console.error(err);
     // }
     // global.logger(process.argv);
+    await (0, previousUpdate_1.saveCompletionStatus)(msg ? `Error: ${msg}` : `Success`);
     if (!process.argv.includes(`--silent`) && !process.argv.includes(`--quiet`)) {
         readlineInterface_1.readlineInterface.pause();
         await new Promise(r => {

@@ -6,6 +6,7 @@ import { loadKnownMails } from "./knownMails";
 import { loadKnownMailLocations } from "./knownMailLocations";
 import { createExportRootDirectories } from "./targetDirectories";
 import { clearErrorLogFiles } from "./errorLogFile";
+import { refreshLastUpdateFile } from "./previousUpdate";
 
 export async function prepare() {
   global.logger(`preparing`);
@@ -15,6 +16,7 @@ export async function prepare() {
   await clearErrorLogFiles();
   await loadKnownMails();
   await loadKnownMailLocations();
+  await refreshLastUpdateFile();
   const existingDirectories = await listExistingSourceDirectories(sourceDirectories);
   if (!existingDirectories.length) {
     await exit(`No source directory exists.`);
@@ -24,5 +26,3 @@ export async function prepare() {
   global.logger(`Prepared.`);
   return { existingDirectories };
 }
-
-

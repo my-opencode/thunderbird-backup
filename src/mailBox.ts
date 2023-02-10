@@ -138,6 +138,8 @@ function messageIdSecondGuess(currentMail: ICurrentMail): string {
     }
   }
 
+  global.idErrorCount++;
+
   const hash = createHash(`md5`).update(currentMail.contents).digest(`hex`);
 
   errorLog += `\n\nUsing hash insteal: "${hash}"\n\n${currentMail.contents}\n\n`;

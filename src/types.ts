@@ -17,6 +17,7 @@ declare global {
   var MAILFILEEXT:string;
   var exportDirAbs: Directory | undefined;
   var lockFileName:string;
+  var previousUpdateFileName:string;
   var errorsDecodeFileName:string;
   var errorsNoIdFileName:string;
   var errorsMoveFileName:string;
@@ -25,6 +26,12 @@ declare global {
   var lockFileAbs: string | undefined;
   var knownMails: Set<string>;
   var knownMailLocations: Map<string,[string,string]>;
+  var runStartTime: [number,number];
+  var savedCount: number;
+  var movedCount: number;
+  var idErrorCount: number;
+  var encodingErrorCount: number;
+  var moveErrorCount: number;
 }
 
 export interface ICurrentMail {
