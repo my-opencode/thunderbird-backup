@@ -1,6 +1,6 @@
 {
   "name": "thunderbird-backup",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Backups thunderbird emails",
   "main": "dist/main.js",
   "scripts": {
@@ -10,8 +10,8 @@
     "clean": "rm -r ./exports/*",
     "run:clean-dev": "npm run clean && npm run run:dev",
     "run:dist": "cross-env-shell node ./dist/main.js --config $PWD/config.json",
-    "pkg": "npm run build && pkg ./dist/main.js -t node14 -o thunderbird_backup.exe",
-    "start": "cross-env-shell ./thunderbird_backup.exe",
+    "pkg": "npm run build && cross-env-shell pkg ./dist/main.js -t node14 -o ./releases/thunderbird_backup.$npm_package_version.exe",
+    "start": "cross-env-shell ./releases/thunderbird_backup.$npm_package_version.exe --config $PWD/config.json",
     "pwd": "cross-env-shell node ./dist/main.js --config $PWD/config.json"
   },
   "repository": {
