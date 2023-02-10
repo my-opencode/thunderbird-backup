@@ -19,6 +19,7 @@ declare global {
   var lockFileName:string;
   var errorsDecodeFileName:string;
   var errorsNoIdFileName:string;
+  var errorsMoveFileName:string;
   var knownMailFileName:string;
   var knownMailLocationFileName:string;
   var lockFileAbs: string | undefined;

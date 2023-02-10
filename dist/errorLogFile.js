@@ -22,5 +22,12 @@ async function clearErrorLogFiles() {
         catch (err) {
             // do nothing;
         }
+    if (global.errorsMoveFileName)
+        try {
+            await promises_1.default.rm(global.exportDirAbs.appendAbs(global.errorsMoveFileName));
+        }
+        catch (err) {
+            // do nothing;
+        }
 }
 exports.clearErrorLogFiles = clearErrorLogFiles;

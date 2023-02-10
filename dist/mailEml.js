@@ -42,13 +42,30 @@ async function saveEmail(dir, currentMail) {
 }
 exports.saveEmail = saveEmail;
 const moveCalls = [];
-async function moveEmail(id, outDir) {
-    moveCalls.push(id);
-    const { dir: prevLocation, name: filename } = (0, knownMailLocations_1.getMailLocationAndName)(id) || {};
-    if (!prevLocation || !filename)
-        throw new Error(`Cannot move unknown mail`);
-    await promises_1.default.rename(prevLocation.appendAbs(filename), outDir.appendAbs(filename));
-    (0, knownMailLocations_1.rememberMailLocation)(id, outDir.relPath, filename);
-    global.logger(`Moved "${filename}" from "${prevLocation.relPath}" to "${outDir.relPath}"`);
+async function moveEmail(dir, currentMail) {
+    let prevLocation, filename;
+    try {
+        moveCalls.push(currentMail.messageId);
+        ({ dir: prevLocation, name: filename } = (0, knownMailLocations_1.getMailLocationAndName)(currentMail.messageId) || {});
+        if (!prevLocation || !filename)
+            throw new Error(`Cannot move unknown mail`);
+        await promises_1.default.rename(prevLocation.appendAbs(filename), dir.appendAbs(filename));
+        (0, knownMailLocations_1.rememberMailLocation)(currentMail.messageId, dir.relPath, filename);
+        global.logger(`Moved "${filename}" from "${prevLocation.relPath}" to "${dir.relPath}"`);
+    }
+    catch (err) {
+        let errorLog = `==== Move Email Error ====\n\n`;
+        errorLog += err instanceof Error ? `${err.message}\n\n${err.stack}` : typeof err === `string` ? err : `Unexpected error.`;
+        errorLog += `\n\n`;
+        errorLog += `ID: "${currentMail.messageId}"\n`;
+        errorLog += `To: "${dir.relPath}"\n`;
+        if (prevLocation)
+            errorLog += `From: "${prevLocation.relPath}"\n`;
+        if (filename)
+            errorLog += `FileName: "${filename}"\n`;
+        errorLog += `\n`;
+        if (global.exportDirAbs?.path)
+            promises_1.default.appendFile(global.exportDirAbs.appendAbs(global.errorsMoveFileName), errorLog, { encoding: `utf-8` });
+    }
 }
 exports.moveEmail = moveEmail;

@@ -13,6 +13,7 @@ global.knownMailFileName = `known_mails`;
 global.knownMailLocationFileName = `known_mail_locations`;
 global.errorsDecodeFileName = `errors_decode`;
 global.errorsNoIdFileName = `errors_id`;
+global.errorsMoveFileName = `errors_move`;
 global.knownMails = new Set();
 global.knownMailLocations = new Map();
 async function run(exePath) {

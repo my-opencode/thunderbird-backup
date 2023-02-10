@@ -13,4 +13,10 @@ export async function clearErrorLogFiles() {
     } catch (err) {
       // do nothing;
     }
+  if (global.errorsMoveFileName)
+    try {
+      await fs.rm(global.exportDirAbs.appendAbs(global.errorsMoveFileName));
+    } catch (err) {
+      // do nothing;
+    }
 }

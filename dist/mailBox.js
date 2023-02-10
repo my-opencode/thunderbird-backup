@@ -61,7 +61,7 @@ async function processMBoxLine(outDir, currentMail, line, isLast) {
             currentMail.count++;
         }
         else if (currentMail.known && (0, knownMailLocations_1.isEmailLocationDiff)(currentMail.messageId, outDir.relPath)) {
-            await (0, mailEml_1.moveEmail)(currentMail.messageId, outDir);
+            await (0, mailEml_1.moveEmail)(outDir, currentMail);
         }
         currentMail.contents = line;
         currentMail.subject = ``;
