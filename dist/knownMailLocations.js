@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMailLocationAndName = exports.isEmailLocationDiff = exports.rememberMailLocation = exports.loadKnownMailLocations = void 0;
+exports.getMailLocationAndName = exports.isEmailLocationDiff = exports.rememberMailLocation = exports.cleanKnownMailLocations = exports.loadKnownMailLocations = void 0;
 const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
 const Directory_1 = require("./Directory");
@@ -26,6 +26,24 @@ async function loadKnownMailLocations() {
     }
 }
 exports.loadKnownMailLocations = loadKnownMailLocations;
+async function cleanKnownMailLocations() {
+    global.logger(`Cleaning known mail locations.`);
+    try {
+        if (!global.exportDirAbs?.path)
+            return;
+        const filePath = global.exportDirAbs.appendAbs(global.knownMailLocationFileName);
+        await promises_1.default.rename(filePath, filePath + `_bak`);
+        const appendTasks = [];
+        for (const [id, [relPath, name]] of global.knownMailLocations.entries())
+            appendTasks.push(promises_1.default.appendFile(filePath, `${id};${relPath};${name}\n`, { encoding: `utf-8` }));
+        await Promise.all(appendTasks);
+        global.logger(`Known mail locations cleaned.`);
+    }
+    catch (err) {
+        // do nothing
+    }
+}
+exports.cleanKnownMailLocations = cleanKnownMailLocations;
 function rememberMailLocation(id, location, filename) {
     // global.logger(`Memorizing email location.`);
     if (exportDirAbs?.path) // accept updates

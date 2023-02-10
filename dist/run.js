@@ -7,6 +7,7 @@ const backupRepositories_1 = require("./backupRepositories");
 require("core-js/modules/es.string.replace-all");
 const rootPath_1 = require("./rootPath");
 const logger_1 = require("./logger");
+const cleanup_1 = require("./cleanup");
 global.MAILFILEEXT = `.msf`;
 global.lockFileName = `current_lock`;
 global.previousUpdateFileName = `last_update`;
@@ -31,6 +32,7 @@ async function run(exePath) {
         const { existingDirectories } = await (0, prepare_1.prepare)();
         await (0, backupRepositories_1.backupRepositories)(existingDirectories);
         global.logger(`Backup complete.`);
+        await (0, cleanup_1.cleanup)();
         await (0, exit_1.exit)();
     }
     catch (err) {

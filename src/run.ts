@@ -4,6 +4,7 @@ import { backupRepositories } from "./backupRepositories";
 import "core-js/modules/es.string.replace-all";
 import { setRootPath } from "./rootPath";
 import { setLogger } from "./logger";
+import { cleanup } from "./cleanup";
 
 global.MAILFILEEXT = `.msf`;
 global.lockFileName = `current_lock`;
@@ -31,6 +32,7 @@ export async function run(exePath?: string) {
     const { existingDirectories } = await prepare();
     await backupRepositories(existingDirectories);
     global.logger(`Backup complete.`);
+    await cleanup();
     await exit();
   } catch (err) {
     console.error(err);
