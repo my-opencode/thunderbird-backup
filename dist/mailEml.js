@@ -36,6 +36,7 @@ async function saveEmail(dir, currentMail) {
     (0, knownMails_1.rememberEmail)(currentMail.messageId);
     const filename = await getEmailName(dir, currentMail);
     await promises_1.default.writeFile(dir.appendAbs(filename), currentMail.contents, { encoding: `utf-8` });
+    global.savedCount++;
     (0, knownMailLocations_1.rememberMailLocation)(currentMail.messageId, dir.relPath, filename);
     // global.logger(`Email saved.`);
     global.logger(`Saved email ${currentMail.count + 1}. (${currentMail.messageId})`);
@@ -50,10 +51,12 @@ async function moveEmail(dir, currentMail) {
         if (!prevLocation || !filename)
             throw new Error(`Cannot move unknown mail`);
         await promises_1.default.rename(prevLocation.appendAbs(filename), dir.appendAbs(filename));
+        global.movedCount++;
         (0, knownMailLocations_1.rememberMailLocation)(currentMail.messageId, dir.relPath, filename);
         global.logger(`Moved "${filename}" from "${prevLocation.relPath}" to "${dir.relPath}"`);
     }
     catch (err) {
+        global.moveErrorCount++;
         let errorLog = `==== Move Email Error ====\n\n`;
         errorLog += err instanceof Error ? `${err.message}\n\n${err.stack}` : typeof err === `string` ? err : `Unexpected error.`;
         errorLog += `\n\n`;

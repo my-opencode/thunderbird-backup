@@ -13,6 +13,7 @@ export class Decoder {
     } catch (err) {
       if (str.length) {
         // Most likely an encoding error
+        global.encodingErrorCount++;
         const message = err instanceof Error
           ? `${err.message}\n\n${err.stack}`
           : typeof err === `string`

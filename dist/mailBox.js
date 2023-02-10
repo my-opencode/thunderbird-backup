@@ -141,6 +141,7 @@ function messageIdSecondGuess(currentMail) {
             errorLog += `\nDid not find message-id contents.`;
         }
     }
+    global.idErrorCount++;
     const hash = (0, crypto_1.createHash)(`md5`).update(currentMail.contents).digest(`hex`);
     errorLog += `\n\nUsing hash insteal: "${hash}"\n\n${currentMail.contents}\n\n`;
     if (global.exportDirAbs?.path)
